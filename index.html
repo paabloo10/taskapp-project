@@ -1,106 +1,86 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Task Manager</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow</title>
+
+    <link rel="stylesheet" href="styles.css">
+
 </head>
 
 <body>
 
-<header>
-  <h1>Task Manager</h1>
-</header>
+    <header class="header">
+        <h1>TaskFlow</h1>
+        <button class="add-btn">+ Nueva tarea</button>
+    </header>
 
-<main class="layout">
 
-  <aside class="sidebar">
-    <h2>Categorias</h2>
-    <ul>
-      <li>Trabajo</li>
-      <li>Estudio</li>
-      <li>Personal</li>
-    </ul>
-  </aside>
+    <main class="layout">
 
-  <section class="tasks">
+        <aside class="sidebar">
 
-    <h2>Mis tareas</h2>
+            <h2>Menu</h2>
 
-    <div class="task-card high">
-      <span class="task-title">Terminar proyecto</span>
-      <span class="category">Trabajo</span>
-      <span class="badge">Alta</span>
-    </div>
+            <ul class="menu">
+                <li>Todas</li>
+                <li>Trabajo</li>
+                <li>Estudio</li>
+                <li>Personal</li>
+            </ul>
 
-    <div class="task-card medium">
-      <span class="task-title">Estudiar CSS</span>
-      <span class="category">Estudio</span>
-      <span class="badge">Media</span>
-    </div>
+        </aside>
 
-    <div class="task-card low">
-      <span class="task-title">Hacer ejercicio</span>
-      <span class="category">Personal</span>
-      <span class="badge">Baja</span>
-    </div>
 
-  </section>
+        <section class="tasks">
 
-</main>
+            <h2>Mis tareas</h2>
 
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Task Manager</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
 
-<body>
+            <div class="task-card high">
+                <div class="task-info">
+                    <h3>Terminar diseño de la app</h3>
+                    <p>Proyecto final</p>
+                </div>
 
-<header>
-  <h1>Task Manager</h1>
-</header>
+                <div class="task-meta">
+                    <span class="category">Trabajo</span>
+                    <span class="badge">Alta</span>
+                </div>
+            </div>
 
-<main class="layout">
 
-  <aside class="sidebar">
-    <h2>Categorías</h2>
-    <ul>
-      <li>Trabajo</li>
-      <li>Estudio</li>
-      <li>Personal</li>
-    </ul>
-  </aside>
+            <div class="task-card medium">
+                <div class="task-info">
+                    <h3>Estudiar Flexbox</h3>
+                    <p>Curso de CSS</p>
+                </div>
 
-  <section class="tasks">
+                <div class="task-meta">
+                    <span class="category">Estudio</span>
+                    <span class="badge">Media</span>
+                </div>
+            </div>
 
-    <h2>Mis tareas</h2>
 
-    <div class="task-card high">
-      <span class="task-title">Terminar proyecto</span>
-      <span class="category">Trabajo</span>
-      <span class="badge">Alta</span>
-    </div>
+            <div class="task-card low">
+                <div class="task-info">
+                    <h3>Salir a correr</h3>
+                    <p>30 minutos</p>
+                </div>
 
-    <div class="task-card medium">
-      <span class="task-title">Estudiar CSS</span>
-      <span class="category">Estudio</span>
-      <span class="badge">Media</span>
-    </div>
+                <div class="task-meta">
+                    <span class="category">Personal</span>
+                    <span class="badge">Baja</span>
+                </div>
+            </div>
 
-    <div class="task-card low">
-      <span class="task-title">Hacer ejercicio</span>
-      <span class="category">Personal</span>
-      <span class="badge">Baja</span>
-    </div>
+        </section>
 
-  </section>
-
-</main>
+    </main>
 
 </body>
+
 </html>
