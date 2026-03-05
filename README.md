@@ -1,2 +1,3 @@
 #TaskFlow Project
-Este es el proyecto TaskFlow
+
+Este proyecto se basa en una aplicacion de gestion de tareas
