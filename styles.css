@@ -1,0 +1,126 @@
+/* VARIABLES CSS */
+
+:root {
+  --color-primary: #f59e05;
+  --color-bg: #f5f5f5;
+  --color-card: #ffffff;
+
+  --priority-high: #ef4444;
+  --priority-medium: #f59e0b;
+  --priority-low: #10b981;
+
+  --font-main: Arial, sans-serif;
+
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+}
+
+
+/* RESET */
+
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  background: var(--color-bg);
+}
+
+
+/* HEADER */
+
+header {
+  background: var(--color-primary);
+  color: white;
+  padding: var(--space-md);
+  text-align: center;
+}
+
+
+/* LAYOUT */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 220px;
+  background: white;
+  padding: var(--space-md);
+  border-right: 1px solid #ddd;
+}
+
+
+/* TASK SECTION */
+
+.tasks {
+  flex: 1;
+  padding: var(--space-lg);
+}
+
+
+/* TASK CARD */
+
+.task-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: var(--color-card);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+
+  border-radius: 8px;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+/* BONUS: transición */
+
+.task-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+
+/* BADGES */
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+}
+
+.high .badge {
+  background: var(--priority-high);
+}
+
+.medium .badge {
+  background: var(--priority-medium);
+}
+
+.low .badge {
+  background: var(--priority-low);
+}
+
+
+/* MEDIA QUERY */
+
+@media (max-width: 768px) {
+
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+}
