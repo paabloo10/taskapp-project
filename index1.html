@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>TaskFlow</h1>
+        <button class="add-btn">+ Nueva tarea</button>
+    </header>
+
+
+    <main class="layout">
+
+        <aside class="sidebar">
+
+            <h2>Menu</h2>
+
+            <ul class="menu">
+                <li>Todas</li>
+                <li>Trabajo</li>
+                <li>Estudio</li>
+                <li>Personal</li>
+            </ul>
+
+        </aside>
+
+
+        <section class="tasks">
+
+            <h2>Mis tareas</h2>
+            <form id="taskForm">
+                <input 
+                    type="text"
+                    id="taskInput"
+                    placeholder="Añadir nueva tarea..."
+                    required
+                >
+                <button type="submit">Añadir</button>
+            </form>
+
+            <input 
+                type="text"
+                id="searchInput"
+                placeholder="Buscar tarea..."
+            >
+
+        <div id="taskList">   
+            
+            <div class="task-card high">
+                <div class="task-info">
+                    <h3>Terminar diseño de la app</h3>
+                    <p>Proyecto final</p>
+                </div>
+
+                <div class="task-meta">
+                    <span class="category">Trabajo</span>
+                    <span class="badge">Alta</span>
+                    <button class="delete-btn">Eliminar</button>
+                </div>
+            </div>
+
+
+            <div class="task-card medium">
+                <div class="task-info">
+                    <h3>Estudiar Flexbox</h3>
+                    <p>Curso de CSS</p>
+                </div>
+
+                <div class="task-meta">
+                    <span class="category">Estudio</span>
+                    <span class="badge">Media</span>
+                    <button class="delete-btn">Eliminar</button>
+                </div>
+            </div>
+
+
+            <div class="task-card low">
+                <div class="task-info">
+                    <h3>Salir a correr</h3>
+                    <p>30 minutos</p>
+                </div>
+
+                <div class="task-meta">
+                    <span class="category">Personal</span>
+                    <span class="badge">Baja</span>
+                </div>
+            </div>
+        </div>
+        </section>
+        <script src="app.js"></script>
+    </main>
+
+</body>
+
+</html>
