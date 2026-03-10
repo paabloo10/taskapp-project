@@ -1,6 +1,6 @@
 # TaskFlow
 
-Aplicación web de gestión de tareas desarrollada con HTML, CSS y JavaScript.
+Aplicación web de gestión de tareas desarrollada con HTML, Tailwind CSS y JavaScript.
 
 ## Funcionalidades
 
@@ -13,6 +13,6 @@ Aplicación web de gestión de tareas desarrollada con HTML, CSS y JavaScript.
 ## Tecnologías
 
 - HTML5
-- CSS
+- Tailwind CSS
 - JavaScript
 - LocalStorage
