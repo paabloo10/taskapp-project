@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6366f1",
+                        high: "#ef4444",
+                        medium: "#f59e0b",
+                        low: "#10b981"
+                    },
+                    spacing: {
+                        sm: "8px",
+                        md: "16px",
+                        lg: "24px"
+                    },
+                    fontFamily: {
+                        main: ["Segoe UI", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Task Manager</title>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 font-main text-gray-900 dark:text-gray-100">
+
+    <!-- HEADER -->
+    <header class="flex justify-between items-center px-8 py-5 bg-white dark:bg-gray-800 border-b">
+
+        <h1 class="text-xl font-bold">Task Manager</h1>
+
+        <button id="toggleDark" class="bg-primary text-white px-4 py-2 rounded-lg">
+            Modo oscuro
+        </button>
+
+    </header>
+
+
+    <!-- LAYOUT -->
+    <main class="flex min-h-screen md:flex-row flex-col">
+
+        <!-- SIDEBAR -->
+        <aside class="bg-gray-800 text-white w-[220px] p-6 md:block flex justify-center">
+
+            <ul class="flex md:flex-col gap-3">
+                <li class="hover:bg-white/10 p-2 rounded">Todas</li>
+                <li class="hover:bg-white/10 p-2 rounded">Trabajo</li>
+                <li class="hover:bg-white/10 p-2 rounded">Personal</li>
+            </ul>
+
+        </aside>
+
+
+        <!-- TASK SECTION -->
+        <section class="flex-1 p-10">
+
+            <h2 class="text-2xl font-semibold mb-6">Lista de tareas</h2>
+
+            <!-- FORM -->
+            <form id="taskForm" class="flex gap-3 mb-6">
+
+                <input id="taskInput" type="text" placeholder="Nueva tarea..." class="flex-1 p-3 border rounded-lg" />
+
+                <select id="priority" class="p-3 border rounded-lg">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+
+                <button class="bg-primary text-white px-5 rounded-lg">
+                    Añadir
+                </button>
+
+            </form>
+
+            <!-- TASK LIST -->
+            <div id="taskList" class="flex flex-col gap-4">
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
