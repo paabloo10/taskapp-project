@@ -156,3 +156,36 @@ Los ejemplos de ChatGPT resultan más intuitivos y fáciles de entender, mientra
 ---
 
 ### Errores detectados en Claude ###
+
+## 1. Error logico (sumar(a, b)) ##
+ERROR LÓGICO — el código ejecuta, pero hace lo contrario
+El operador - resta en lugar de sumar. El programa no lanza ningún error ni aviso: arranca sin problemas, produce un número y lo devuelve. Por eso este tipo de bug es especialmente peligroso — el motor de JavaScript no puede saber que la intención era otra.
+
+Se llama error lógico porque el fallo está en el razonamiento del programador, no en la sintaxis ni en los tipos. Solo se detecta comparando el resultado con el esperado.
+
+// ✅ return a + b;
+
+## 2. Error sintaxis esPar(numero) ##
+CONFUSIÓN = vs === — uno de los errores más frecuentes en JS
+En JavaScript hay tres operadores que parecen parecidos pero hacen cosas muy distintas:
+
+=  → asignación: guarda un valor en una variable.
+== → comparación laxa: compara con conversión de tipos.
+=== → comparación estricta: compara valor y tipo, sin convertir.
+
+Usar = dentro de un if intenta asignar, lo cual es inválido aquí y lanza un SyntaxError antes de que el programa llegue a ejecutarse.
+
+// ✅ if (numero % 2 === 0)
+
+## 3. ReferenceError saludar(nombre) ##
+JavaScript es case-sensitive: nombre y Name son dos identificadores completamente distintos. El parámetro de la función se llama nombre (minúscula), pero dentro del cuerpo se usa Name (mayúscula), que no ha sido declarada en ningún lugar.
+
+Cuando JavaScript intenta leer Name en tiempo de ejecución, busca esa variable en el ámbito actual, en el de la función y en el global — y no la encuentra en ninguno. El resultado es un ReferenceError: Name is not defined que detiene la ejecución en ese punto.
+
+// ✅ console.log("Hola " + nombre);
+
+
+Los tres errores pertenecen a categorías distintas, lo que los hace buenos ejemplos para aprender a distinguirlas:
+Error 1 — Lógico: el más difícil de detectar. El código es sintácticamente perfecto, JavaScript lo ejecuta sin quejarse, pero el resultado es incorrecto. Solo se descubre probando con valores y comprobando la salida.
+Error 2 — Sintaxis: el más inmediato. El motor lo detecta antes de ejecutar una sola línea. En este caso, usar = dentro de un if es inválido para el parser y lanza un SyntaxError en el momento de cargar el script.
+Error 3 — ReferenceError: ocurre en tiempo de ejecución. La sintaxis es válida, el programa arranca, pero en cuanto llega a esa línea busca Name en memoria, no lo encuentra y se detiene. La causa es que JavaScript distingue mayúsculas de minúsculas: nombre y Name son variables completamente distintas.
