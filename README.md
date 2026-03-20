@@ -46,9 +46,9 @@ Esta app es “estática” (solo front-end):
 2. Asegúrate de que `app.js` esté en la misma carpeta.
 
 No se requiere:
-- `npm install`
-- build tools
-- bundlers
+-  npm install
+-  build tools
+-  undlers
 
 ## 5. Cómo usar la aplicación
 
