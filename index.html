@@ -12,6 +12,10 @@
             darkMode: 'class',
             theme: {
                 extend: {
+                    screens: {
+                        '3xl': '1920px',
+                        '4xl': '2560px'
+                    },
                     colors: {
                         primary: "#6366f1",
                         high: "#ef4444",
@@ -45,9 +49,9 @@
 
     <!-- HEADER -->
     <header
-        class="sticky top-0 z-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 px-4 sm:px-6 md:px-10 py-4 sm:py-5 border-b border-black/5 dark:border-white/10 bg-white/70 dark:bg-gray-950/60 backdrop-blur">
+        class="sticky top-0 z-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 px-4 sm:px-6 md:px-10 2xl:px-16 3xl:px-24 py-4 sm:py-5 border-b border-black/5 dark:border-white/10 bg-white/70 dark:bg-gray-950/60 backdrop-blur">
 
-        <h1 class="text-xl font-bold tracking-tight">
+        <h1 class="text-xl sm:text-2xl 2xl:text-3xl font-bold tracking-tight">
             Task<span class="text-primary">Flow</span>
         </h1>
 
@@ -60,11 +64,12 @@
 
 
     <!-- LAYOUT -->
-    <main class="mx-auto flex w-full max-w-6xl flex-1 md:flex-row flex-col gap-6 px-4 sm:px-6 md:px-10 py-6 sm:py-8">
+    <main
+        class="mx-auto flex w-full max-w-7xl 2xl:max-w-[96rem] 3xl:max-w-[110rem] 4xl:max-w-[128rem] flex-1 md:flex-row flex-col gap-6 2xl:gap-8 px-4 sm:px-6 md:px-10 2xl:px-16 3xl:px-24 py-6 sm:py-8 2xl:py-10">
 
         <!-- SIDEBAR -->
         <aside
-            class="text-white w-full md:w-[240px] p-4 sm:p-6 md:block flex justify-center rounded-2xl border border-white/10 bg-gradient-to-b from-gray-900/90 to-gray-950/90 backdrop-blur shadow-lg shadow-black/10">
+            class="text-white w-full md:w-[240px] 2xl:w-[280px] 3xl:w-[320px] p-4 sm:p-6 2xl:p-7 md:block flex justify-center rounded-2xl border border-white/10 bg-gradient-to-b from-gray-900/90 to-gray-950/90 backdrop-blur shadow-lg shadow-black/10">
 
             <ul class="flex md:flex-col gap-2 w-full flex-wrap" id="categorySidebar">
                 <li data-category="all"
@@ -83,12 +88,13 @@
 
 
         <!-- TASK SECTION -->
-        <section class="flex-1 rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-gray-950/60 backdrop-blur p-4 sm:p-6 md:p-10 shadow-lg shadow-black/5">
+        <section
+            class="flex-1 rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-gray-950/60 backdrop-blur p-4 sm:p-6 md:p-10 2xl:p-12 3xl:p-14 shadow-lg shadow-black/5">
 
             <div class="flex items-end justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="text-2xl font-semibold tracking-tight">Lista de tareas</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">Organiza tu día con prioridades y foco.</p>
+                    <h2 class="text-2xl 2xl:text-3xl 3xl:text-4xl font-semibold tracking-tight">Lista de tareas</h2>
+                    <p class="text-sm 2xl:text-base text-gray-600 dark:text-gray-300">Organiza tu día con prioridades y foco.</p>
                 </div>
             </div>
 
@@ -123,6 +129,11 @@
                 <input id="searchInput" type="text" placeholder="Buscar tareas..."
                     class="w-full flex-1 p-3 rounded-xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-gray-900/50 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition" />
 
+                <button id="toggleCompletedView" type="button"
+                    class="w-full md:w-auto rounded-xl px-4 py-3 text-sm font-semibold border border-black/10 dark:border-white/10 bg-white/80 dark:bg-gray-900/50 hover:bg-white dark:hover:bg-gray-900/70 transition">
+                    Completadas
+                </button>
+
                 <select id="filterCategory"
                     class="w-full md:w-44 p-3 rounded-xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-gray-900/50 outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition">
                     <option value="all">Todas</option>
@@ -147,6 +158,23 @@
         </section>
 
     </main>
+
+    <footer class="mx-auto w-full max-w-7xl 2xl:max-w-[96rem] 3xl:max-w-[110rem] 4xl:max-w-[128rem] px-4 sm:px-6 md:px-10 2xl:px-16 3xl:px-24 pb-8 2xl:pb-10">
+        <div
+            class="mt-6 rounded-2xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-gray-950/40 backdrop-blur p-4 2xl:p-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div class="text-sm 2xl:text-base">
+                <div class="font-semibold 2xl:text-lg">Pablo Rodriguez</div>
+                <div class="text-gray-600 dark:text-gray-400">Contacto</div>
+            </div>
+
+            <div class="flex flex-col gap-1 text-sm 2xl:text-base md:items-end">
+                <a class="text-primary hover:underline break-all" href="mailto:pablorodriguezrustom@gmail.com">pablorodriguezrustom@gmail.com</a>
+                <a class="text-primary hover:underline" href="tel:+34 621 097 180">+34 621 097 180</a>
+                <a class="text-primary hover:underline" href="https://github.com/paabloo10" target="_blank"
+                    rel="noreferrer">github.com/paabloo10</a>
+            </div>
+        </div>
+    </footer>
 
     <script src="app.js"></script>
 
