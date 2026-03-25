@@ -8,6 +8,7 @@ const categorySidebar = document.getElementById("categorySidebar")
 const searchInput = document.getElementById("searchInput")
 const filterCategorySelect = document.getElementById("filterCategory")
 const filterPrioritySelect = document.getElementById("filterPriority")
+const toggleCompletedViewButton = document.getElementById("toggleCompletedView")
 
 /**
  * @typedef {"low" | "medium" | "high"} TaskPriority
@@ -23,6 +24,7 @@ const filterPrioritySelect = document.getElementById("filterPriority")
  * @property {string} text - Descripción de la tarea
  * @property {TaskCategory} category - Categoría de la tarea
  * @property {TaskPriority} priority - Prioridad de la tarea
+ * @property {boolean} completed - Indica si la tarea está completada
  */
 
 /** @type {Task[]} */
@@ -35,6 +37,9 @@ let activeCategoryFilter = "all"
 let activePriorityFilter = "all"
 
 let searchQuery = ""
+
+/** @type {boolean} */
+let showCompletedOnly = false
 
 /**
  * Carga las tareas desde localStorage.
@@ -51,6 +56,7 @@ function loadTasksFromStorage() {
             .map((t) => {
                 const priority = t.priority
                 const category = t.category
+                const completed = t.completed
 
                 /** @type {TaskPriority} */
                 const normalizedPriority =
@@ -64,7 +70,8 @@ function loadTasksFromStorage() {
                     id: typeof t.id === "string" ? t.id : String(Date.now()),
                     text: typeof t.text === "string" ? t.text : "",
                     category: normalizedCategory,
-                    priority: normalizedPriority
+                    priority: normalizedPriority,
+                    completed: Boolean(completed)
                 }
             })
     } catch {
@@ -117,7 +124,12 @@ function createTaskElement(task, index) {
     const taskCard = document.createElement("div")
 
     taskCard.className =
-        "flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow"
+        "flex justify-between items-center p-4 rounded-lg shadow border border-black/5 dark:border-white/10 bg-white dark:bg-gray-800 transition-colors"
+
+    if (task.completed) {
+        taskCard.className +=
+            " bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-400/20"
+    }
 
     const badgeColors = {
         high: "bg-high",
@@ -125,9 +137,11 @@ function createTaskElement(task, index) {
         low: "bg-low"
     }
 
+    const titleClass = task.completed ? "font-semibold line-through" : "font-semibold"
+
     taskCard.innerHTML = `
 <div class="flex flex-col">
-  <h3 class="font-semibold">${task.text}</h3>
+  <h3 class="${titleClass}">${task.text}</h3>
   <span class="text-sm text-gray-500">${formatCategoryLabel(task.category)} · ${formatPriorityLabel(task.priority)}</span>
 </div>
 
@@ -136,11 +150,20 @@ function createTaskElement(task, index) {
     ${formatPriorityLabel(task.priority)}
   </span>
 
+  <button class="toggle-completed bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded">
+    ${task.completed ? "Reabrir" : "Hecha"}
+  </button>
+
   <button class="delete bg-red-500 text-white px-2 py-1 rounded">
     X
   </button>
 </div>
 `
+
+    const toggleCompletedButton = taskCard.querySelector(".toggle-completed")
+    toggleCompletedButton.addEventListener("click", () => {
+        toggleTaskCompleted(index)
+    })
 
     const deleteButton = taskCard.querySelector(".delete")
     deleteButton.addEventListener("click", () => {
@@ -148,6 +171,18 @@ function createTaskElement(task, index) {
     })
 
     return taskCard
+}
+
+/**
+ * Alterna el estado completado de una tarea por índice.
+ * @param {number} index
+ */
+function toggleTaskCompleted(index) {
+    const t = tasks[index]
+    if (!t) return
+    t.completed = !t.completed
+    saveTasks(tasks)
+    renderTasks()
 }
 
 /**
@@ -172,8 +207,9 @@ function getFilteredTasks(allTasks) {
         const matchesText = !q || task.text.toLowerCase().includes(q)
         const matchesCategory = activeCategoryFilter === "all" || task.category === activeCategoryFilter
         const matchesPriority = activePriorityFilter === "all" || task.priority === activePriorityFilter
+        const matchesCompleted = !showCompletedOnly || task.completed === true
 
-        return matchesText && matchesCategory && matchesPriority
+        return matchesText && matchesCategory && matchesPriority && matchesCompleted
     })
 }
 
@@ -202,6 +238,13 @@ function renderTasks() {
         const taskElement = createTaskElement(task, index)
         taskListContainer.appendChild(taskElement)
     })
+
+    if (toggleCompletedViewButton instanceof HTMLButtonElement) {
+        toggleCompletedViewButton.textContent = showCompletedOnly ? "Ver todas" : "Completadas"
+        toggleCompletedViewButton.classList.toggle("ring-2", showCompletedOnly)
+        toggleCompletedViewButton.classList.toggle("ring-primary/40", showCompletedOnly)
+        toggleCompletedViewButton.classList.toggle("border-primary/40", showCompletedOnly)
+    }
 }
 
 /**
@@ -247,7 +290,8 @@ function addTask(text, category, priority) {
         id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
         text: text.trim(),
         category,
-        priority
+        priority,
+        completed: false
     }
 
     tasks.push(newTask)
@@ -308,6 +352,13 @@ function initializeFilters() {
         activePriorityFilter = v
         renderTasks()
     })
+
+    if (toggleCompletedViewButton instanceof HTMLButtonElement) {
+        toggleCompletedViewButton.addEventListener("click", () => {
+            showCompletedOnly = !showCompletedOnly
+            renderTasks()
+        })
+    }
 }
 
 initializeFilters()
