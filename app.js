@@ -42,6 +42,20 @@ let searchQuery = ""
 let showCompletedOnly = false
 
 /**
+ * Escapa caracteres HTML para evitar inyección al pintar texto del usuario.
+ * @param {string} value
+ * @returns {string}
+ */
+function escapeHtml(value) {
+    return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;")
+}
+
+/**
  * Carga las tareas desde localStorage.
  * @returns {Task[]}
  */
@@ -138,10 +152,11 @@ function createTaskElement(task, index) {
     }
 
     const titleClass = task.completed ? "font-semibold line-through" : "font-semibold"
+    const safeText = escapeHtml(task.text)
 
     taskCard.innerHTML = `
 <div class="flex flex-col">
-  <h3 class="${titleClass}">${task.text}</h3>
+  <h3 class="${titleClass}">${safeText}</h3>
   <span class="text-sm text-gray-500">${formatCategoryLabel(task.category)} · ${formatPriorityLabel(task.priority)}</span>
 </div>
 
