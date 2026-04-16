@@ -23,7 +23,23 @@ class HttpError extends Error {
 }
 
 function sendJson(res, statusCode, payload) {
-  res.status(statusCode).json(payload);
+  // En Vercel suele existir `res.status().json()`, pero lo hacemos compatible con Node puro
+  // para evitar fallos 500 si esos helpers no están.
+  if (typeof res.status === "function" && typeof res.json === "function") {
+    res.status(statusCode).json(payload);
+    return;
+  }
+
+  const body = JSON.stringify(payload);
+  if (typeof res.writeHead === "function") {
+    res.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });
+  } else {
+    res.statusCode = statusCode;
+    if (typeof res.setHeader === "function") {
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+    }
+  }
+  res.end(body);
 }
 
 function parseBody(req) {
