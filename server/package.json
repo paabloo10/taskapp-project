@@ -1,0 +1,10 @@
+{
+  "name": "taskflow-server",
+  "version": "1.0.0",
+  "description": "API REST para TaskFlow",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js"
+  }
+}
