@@ -1,6 +1,6 @@
-# TaskFlow
+# TaskApp
 
-TaskFlow es una aplicacion web para gestionar tareas con categorias, prioridades y estado de completado.
+TaskApp es una aplicacion web para gestionar tareas con categorias, prioridades y estado de completado.
 
 ## Arquitectura actual
 
