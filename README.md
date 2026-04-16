@@ -1,102 +1,151 @@
 # TaskFlow
 
-Documentación rápida del programa (app web de gestión de tareas).
+TaskFlow es una aplicacion web para gestionar tareas con categorias, prioridades y estado de completado.
 
----
+## Arquitectura actual
 
-## 1. Descripción general
+- `index.html`: interfaz principal (Tailwind CDN).
+- `app.js`: cliente web; ahora consume API REST.
+- `server/`: API Node.js para CRUD, filtros y validaciones.
 
-TaskFlow es una aplicación web tipo “gestor de tareas” (front-end) construida con:
-- Tailwind CSS (vía CDN) para estilos y componentes.
-- JavaScript (sin framework) para la lógica.
-- `localStorage` para persistir tareas y la preferencia de modo oscuro.
+## Flujo funcional
 
-## 2. Funciones principales
+1. Crear tarea desde formulario.
+2. Listar tareas aplicando filtros (texto, categoria, prioridad, completadas).
+3. Marcar tarea como completada/reabierta.
+4. Eliminar tarea.
+5. Cambiar tema oscuro/claro (persistido en navegador).
 
-- Crear tareas con:
-  - Texto (descripción)
-  - Categoría: `Trabajo` / `Personal`
-  - Prioridad: `Low` / `Medium` / `High`
-- Listar tareas en tarjetas.
-- Eliminar tareas.
-- Filtrar en tiempo real:
-  - Por categoría (Todas / Trabajo / Personal)
-  - Por prioridad (Todas / low / medium / high)
-  - Buscador de texto (coincidencia parcial, case-insensitive)
-- Modo oscuro con persistencia (se recuerda al recargar).
+## Ejecutar en local
 
-## 3. Estructura del proyecto
+### 1) Levantar API
 
-- `index.html`
-  - Contiene la interfaz: header, sidebar (filtros), formulario, buscador y lista de tareas.
-  - Incluye Tailwind CSS desde CDN.
-  - Carga `app.js`.
-- `app.js`
-  - Gestiona el estado de las tareas (crear, guardar, eliminar).
-  - Renderiza la lista filtrada.
-  - Maneja búsquedas y filtros.
-  - Inicializa y persiste el modo oscuro.
-- `.cursor/mcp.json` (opcional para MCP)
-  - Configura un servidor MCP (filesystem) para acceder a documentación dentro de `docs/`.
+```bash
+cd server
+npm start
+```
 
-## 4. Instalación / ejecución
+API por defecto en `http://localhost:3001`.
 
-Esta app es “estática” (solo front-end):
-1. Abre `index.html` en un navegador moderno.
-2. Asegúrate de que `app.js` esté en la misma carpeta.
+### 2) Abrir frontend
 
-No se requiere:
--  npm install
--  build tools
--  undlers
+Abrir `index.html` en navegador o usar servidor estatico local.
 
-## 5. Cómo usar la aplicación
+El frontend usa por defecto:
 
-### 5.1. Crear una tarea
-1. Escribe un texto en “Nueva tarea...”.
-2. Selecciona categoría: `Personal` o `Trabajo`.
-3. Selecciona prioridad: `Low` / `Medium` / `High`.
-4. Pulsa “Añadir”.
+`http://localhost:3001/api`
 
-Validaciones (en `app.js`)
-- El texto no puede estar vacío.
-- Máximo 120 caracteres.
-- La categoría debe ser válida (`work`/`personal`).
-- La prioridad debe ser válida (`low`/`medium`/`high`).
+Si necesitas otra URL, define en `index.html` antes de cargar `app.js`:
 
-Si falla la validación, se muestra un `alert(...)`.
+```html
+<script>
+  window.TASKFLOW_API_BASE_URL = "https://tu-api/api";
+</script>
+```
 
-### 5.2. Eliminar tareas
-- Cada tarjeta incluye un botón “X”.
-- Al eliminar:
-  - se actualiza el array
-  - se guarda en `localStorage`
-  - se re-renderiza la lista
+## Endpoints disponibles
 
-### 5.3. Filtrar y buscar
+- `GET /api/health`
+- `GET /api/tasks`
+- `POST /api/tasks`
+- `GET /api/tasks/:id`
+- `PATCH /api/tasks/:id`
+- `DELETE /api/tasks/:id`
 
-Filtros (sidebar / selects):
-- Categoría: Todas / Trabajo / Personal
-- Prioridad: Todas / Low / Medium / High
-- Buscador: “Buscar tareas...”
+Para detalle tecnico exhaustivo, ver `server/README.md`.
 
-Los filtros se combinan (texto + categoría + prioridad).
+## Fragmentos clave: llamadas de API (frontend)
 
-### 5.4. Modo oscuro
-- Botón “Modo oscuro” en el header.
-- Se guarda en `localStorage` como `theme`:
-  - `"dark"` o `"light"`.
+Base URL de API con fallback local y soporte en despliegue:
 
-## 6. Persistencia (localStorage)
+```js
+const DEFAULT_API_BASE_URL =
+  window.location.protocol === "file:" ? "http://localhost:3001/api" : `${window.location.origin}/api`;
+const API_BASE_URL = window.TASKFLOW_API_BASE_URL || DEFAULT_API_BASE_URL;
+```
 
-La app guarda:
-- `tasks`: array JSON con:
-  - `id` (string)
-  - `text` (string)
-  - `category` (`work`/`personal`)
-  - `priority` (`low`/`medium`/`high`)
-- `theme`: `"dark"`/`"light"`
+Wrapper centralizado de llamadas HTTP (`fetch`) y parseo de errores:
 
-Al recargar:
-- se cargan las tareas y se renderizan
-- se aplica el tema guardado
+```js
+async function apiRequest(path, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    ...options,
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const details = Array.isArray(payload.details) ? `\n- ${payload.details.join("\n- ")}` : "";
+    throw new Error(`${payload.error || "Error de API"}${details}`);
+  }
+  return payload;
+}
+```
+
+Lectura de tareas con filtros por query params:
+
+```js
+async function fetchTasks() {
+  const query = getCurrentQueryParams().toString();
+  const payload = await apiRequest(`/tasks?${query}`, { method: "GET" });
+  return Array.isArray(payload.data) ? payload.data : [];
+}
+```
+
+Mutaciones de estado por endpoint:
+
+```js
+await apiRequest("/tasks", {
+  method: "POST",
+  body: JSON.stringify({ text, category, priority }),
+});
+
+await apiRequest(`/tasks/${task.id}`, {
+  method: "PATCH",
+  body: JSON.stringify({ completed: !task.completed }),
+});
+
+await apiRequest(`/tasks/${task.id}`, { method: "DELETE" });
+```
+
+## Fragmentos clave: seguimiento y visualizacion de errores
+
+Error de backend normalizado en `apiRequest` (incluye `details[]`):
+
+```js
+if (!response.ok) {
+  const details = Array.isArray(payload.details) ? `\n- ${payload.details.join("\n- ")}` : "";
+  throw new Error(`${payload.error || "Error de API"}${details}`);
+}
+```
+
+Render de error en UI cuando falla carga de lista:
+
+```js
+try {
+  const tasks = await fetchTasks();
+  for (const task of tasks) taskListContainer.appendChild(createTaskElement(task));
+} catch (error) {
+  taskListContainer.innerHTML =
+    `<div class="rounded-xl border border-red-300 bg-red-50 text-red-700 p-3">${error.message}</div>`;
+}
+```
+
+Errores de mutacion informados al usuario en acciones (`POST/PATCH/DELETE`):
+
+```js
+try {
+  await apiRequest(`/tasks/${task.id}`, { method: "DELETE" });
+  await renderTasks();
+} catch (error) {
+  alert(error.message);
+}
+```
+
+## Debug rapido
+
+- Si el frontend muestra error de API:
+  - verifica que `server` este levantado.
+  - verifica CORS y URL de API.
+  - prueba `GET /api/health`.
+- Si hay error de validacion:
+  - revisar mensajes en respuesta JSON (`details`).
