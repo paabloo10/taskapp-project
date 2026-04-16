@@ -27,16 +27,45 @@ function sendJson(res, statusCode, payload) {
 }
 
 function parseBody(req) {
-  if (!req.body) return {};
-  if (typeof req.body === "string") {
-    try {
-      return JSON.parse(req.body);
-    } catch {
-      throw new HttpError(400, "JSON invalido.");
+  // Vercel Node functions no siempre exponen `req.body` parseado.
+  // Soportamos ambos casos: body ya parseado (obj/string) o stream raw.
+  if (req.body !== undefined) {
+    if (!req.body) return {};
+    if (typeof req.body === "string") {
+      try {
+        return JSON.parse(req.body);
+      } catch {
+        throw new HttpError(400, "JSON invalido.");
+      }
     }
+    if (typeof req.body === "object") return req.body;
+    return {};
   }
-  if (typeof req.body === "object") return req.body;
-  return {};
+
+  return new Promise((resolve, reject) => {
+    let data = "";
+
+    req.on("data", (chunk) => {
+      data += chunk;
+      if (data.length > 1_000_000) {
+        reject(new HttpError(413, "Payload demasiado grande."));
+      }
+    });
+
+    req.on("end", () => {
+      if (!data) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(data));
+      } catch {
+        reject(new HttpError(400, "JSON invalido."));
+      }
+    });
+
+    req.on("error", (error) => reject(new HttpError(400, error instanceof Error ? error.message : "Error de lectura.")));
+  });
 }
 
 function validateCreateTask(payload) {
@@ -104,7 +133,7 @@ function applyListFilters(allTasks, query) {
   });
 }
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -136,7 +165,7 @@ module.exports = (req, res) => {
     }
 
     if (req.method === "POST" && !id) {
-      const body = parseBody(req);
+      const body = await parseBody(req);
       const errors = validateCreateTask(body);
       if (errors.length > 0) {
         sendJson(res, 400, { error: "Payload invalido.", details: errors });
@@ -169,7 +198,7 @@ module.exports = (req, res) => {
     }
 
     if (req.method === "PATCH") {
-      const body = parseBody(req);
+      const body = await parseBody(req);
       const errors = validateUpdateTask(body);
       if (errors.length > 0) {
         sendJson(res, 400, { error: "Payload invalido.", details: errors });
