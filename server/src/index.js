@@ -2,7 +2,6 @@
  * TaskFlow API - Servidor principal
  * Orquesta: configuracion, middlewares, rutas y manejo de errores
  */
-
 const express = require('express');
 const cors = require('cors');
 const configuracion = require('./config/env');
