@@ -11,3 +11,4 @@
       "src": "/(.*)",
       "dest": "server/src/index.js"
     }
+ 
