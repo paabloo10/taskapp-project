@@ -68,7 +68,13 @@ async function fetchTasks() {
   const query = getCurrentQueryParams().toString();
   const path = query ? `/tasks?${query}` : "/tasks";
   const payload = await apiRequest(path, { method: "GET" });
-  return Array.isArray(payload) ? payload : [];
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (payload && Array.isArray(payload.data)) {
+    return payload.data;
+  }
+  return [];
 }
 
 function createTaskElement(task) {
@@ -80,21 +86,23 @@ function createTaskElement(task) {
   }
 
   const badgeColors = { high: "bg-high", medium: "bg-medium", low: "bg-low" };
+  const safePriority = badgeColors[task.priority] ? task.priority : "low";
+  const safeCategory = task.category === "work" || task.category === "personal" ? task.category : "personal";
   const title = document.createElement("h3");
   title.className = task.completed ? "font-semibold line-through" : "font-semibold";
-  title.textContent = task.title;
+  title.textContent = task.title || task.text || "Sin titulo";
 
   const meta = document.createElement("span");
   meta.className = "text-sm text-gray-500";
-  meta.textContent = `${formatCategoryLabel(task.category)} · ${formatPriorityLabel(task.priority)}`;
+  meta.textContent = `${formatCategoryLabel(safeCategory)} · ${formatPriorityLabel(safePriority)}`;
 
   const left = document.createElement("div");
   left.className = "flex flex-col";
   left.append(title, meta);
 
   const badge = document.createElement("span");
-  badge.className = `text-white text-xs px-3 py-1 rounded-full ${badgeColors[task.priority]}`;
-  badge.textContent = formatPriorityLabel(task.priority);
+  badge.className = `text-white text-xs px-3 py-1 rounded-full ${badgeColors[safePriority]}`;
+  badge.textContent = formatPriorityLabel(safePriority);
 
   const toggleCompletedButton = document.createElement("button");
   toggleCompletedButton.className = "toggle-completed bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded";
@@ -138,8 +146,15 @@ async function renderTasks() {
     for (const task of tasks) {
       taskListContainer.appendChild(createTaskElement(task));
     }
+    if (tasks.length === 0) {
+      taskListContainer.innerHTML =
+        '<div class="rounded-xl border border-black/10 dark:border-white/10 bg-white/60 dark:bg-gray-900/40 p-3 text-gray-600 dark:text-gray-300">No hay tareas para los filtros actuales.</div>';
+    }
   } catch (error) {
-    taskListContainer.innerHTML = `<div class="rounded-xl border border-red-300 bg-red-50 text-red-700 p-3">${error.message}</div>`;
+    const errorBox = document.createElement("div");
+    errorBox.className = "rounded-xl border border-red-300 bg-red-50 text-red-700 p-3";
+    errorBox.textContent = error instanceof Error ? error.message : "Error inesperado";
+    taskListContainer.replaceChildren(errorBox);
   }
 
   if (toggleCompletedViewButton instanceof HTMLButtonElement) {
@@ -230,9 +245,24 @@ function toggleDarkMode() {
   localStorage.setItem("theme", isDark ? "dark" : "light");
 }
 
-taskForm.addEventListener("submit", onTaskFormSubmit);
-darkModeToggleButton.addEventListener("click", toggleDarkMode);
-initializeFilters();
-initializeThemeFromStorage();
-syncSidebarActiveState();
-renderTasks();
+if (
+  taskForm &&
+  taskInput &&
+  categorySelect &&
+  prioritySelect &&
+  taskListContainer &&
+  categorySidebar &&
+  searchInput &&
+  filterCategorySelect &&
+  filterPrioritySelect &&
+  darkModeToggleButton
+) {
+  taskForm.addEventListener("submit", onTaskFormSubmit);
+  darkModeToggleButton.addEventListener("click", toggleDarkMode);
+  initializeFilters();
+  initializeThemeFromStorage();
+  syncSidebarActiveState();
+  renderTasks();
+} else {
+  console.error("TaskFlow: faltan elementos del DOM requeridos para inicializar la app.");
+}
