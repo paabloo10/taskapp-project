@@ -1,151 +1,118 @@
-# TaskApp
+# TaskFlow App
 
-TaskApp es una aplicacion web para gestionar tareas con categorias, prioridades y estado de completado.
+Aplicacion web de gestion de tareas con interfaz moderna y API REST propia. Permite crear, listar, filtrar, actualizar y eliminar tareas con categorias y prioridad.
 
-## Arquitectura actual
+## Caracteristicas
 
-- `index.html`: interfaz principal (Tailwind CDN).
-- `app.js`: cliente web; ahora consume API REST.
-- `server/`: API Node.js para CRUD, filtros y validaciones.
+- Crear tareas con titulo, categoria y prioridad.
+- Listar tareas con filtros por categoria, prioridad, estado y busqueda por texto.
+- Marcar tareas como completadas o reabrirlas.
+- Eliminar tareas.
+- Interfaz responsive con modo oscuro.
+- API REST integrada en el mismo proyecto.
+- Healthcheck disponible en `/api/health`.
 
-## Flujo funcional
+## Tecnologias usadas
 
-1. Crear tarea desde formulario.
-2. Listar tareas aplicando filtros (texto, categoria, prioridad, completadas).
-3. Marcar tarea como completada/reabierta.
-4. Eliminar tarea.
-5. Cambiar tema oscuro/claro (persistido en navegador).
+### Frontend
 
-## Ejecutar en local
+- HTML5.
+- JavaScript (vanilla, sin framework).
+- Tailwind CSS via CDN.
 
-### 1) Levantar API
+### Backend
+
+- Node.js.
+- Express 5.
+- API REST con almacenamiento en memoria (sin base de datos).
+
+### Auxiliares
+
+- npm para gestion de dependencias y scripts.
+- Vercel para despliegue.
+- `vercel.json` para rutas y configuracion de build.
+
+## Estructura del proyecto
+
+```text
+app/
+|- app.js              # Logica de frontend (UI + llamadas a /api)
+|- index.html          # Vista principal
+|- index.js            # Servidor Express + endpoints API + estaticos
+|- vercel.json         # Configuracion de despliegue en Vercel
+|- package.json
+|- package-lock.json
+`- node_modules/
+```
+
+## Como descargar y ejecutar en local
+
+### 1) Clonar repositorio
 
 ```bash
-cd server
-npm start
+git clone <URL_DEL_REPO>
+cd app
 ```
 
-API por defecto en `http://localhost:3001`.
+### 2) Instalar dependencias
 
-### 2) Abrir frontend
-
-Abrir `index.html` en navegador o usar servidor estatico local.
-
-El frontend usa por defecto:
-
-`http://localhost:3001/api`
-
-Si necesitas otra URL, define en `index.html` antes de cargar `app.js`:
-
-```html
-<script>
-  window.TASKFLOW_API_BASE_URL = "https://tu-api/api";
-</script>
+```bash
+npm install
 ```
 
-## Endpoints disponibles
+### 3) Ejecutar
+
+```bash
+npm run dev
+```
+
+La app quedara disponible en:
+
+- `http://localhost:3000`
+- API en `http://localhost:3000/api`
+
+## Endpoints principales del backend
 
 - `GET /api/health`
 - `GET /api/tasks`
-- `POST /api/tasks`
 - `GET /api/tasks/:id`
-- `PATCH /api/tasks/:id`
+- `POST /api/tasks`
+- `PUT /api/tasks/:id`
 - `DELETE /api/tasks/:id`
 
-Para detalle tecnico exhaustivo, ver `server/README.md`.
+## Despliegue en Vercel
 
-## Fragmentos clave: llamadas de API (frontend)
+Este proyecto ya incluye `vercel.json`, por lo que frontend y backend se despliegan juntos en un solo proyecto de Vercel.
 
-Base URL de API con fallback local y soporte en despliegue:
+### Opcion A (recomendada): desplegar todo junto
 
-```js
-const DEFAULT_API_BASE_URL =
-  window.location.protocol === "file:" ? "http://localhost:3001/api" : `${window.location.origin}/api`;
-const API_BASE_URL = window.TASKFLOW_API_BASE_URL || DEFAULT_API_BASE_URL;
+1. Importa el repositorio en Vercel.
+2. Selecciona como Root Directory la carpeta `app`.
+3. Deploy.
+
+Con esta configuracion:
+
+- `index.js` corre como funcion Node (`@vercel/node`).
+- `index.html` y `app.js` se sirven como estaticos.
+- El frontend consumira `/api` en el mismo dominio.
+
+### Opcion B: desplegar por CLI
+
+```bash
+npm i -g vercel
+vercel login
+vercel
+vercel --prod
 ```
 
-Wrapper centralizado de llamadas HTTP (`fetch`) y parseo de errores:
+> Ejecuta los comandos dentro de la carpeta `app`.
 
-```js
-async function apiRequest(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-    ...options,
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const details = Array.isArray(payload.details) ? `\n- ${payload.details.join("\n- ")}` : "";
-    throw new Error(`${payload.error || "Error de API"}${details}`);
-  }
-  return payload;
-}
-```
+## Desplegar frontend y backend por separado (si quieres separarlos)
 
-Lectura de tareas con filtros por query params:
+Por defecto el proyecto esta preparado para despliegue unificado. Si necesitas separarlos:
 
-```js
-async function fetchTasks() {
-  const query = getCurrentQueryParams().toString();
-  const payload = await apiRequest(`/tasks?${query}`, { method: "GET" });
-  return Array.isArray(payload.data) ? payload.data : [];
-}
-```
+1. **Backend**: crear un proyecto Vercel solo para API (por ejemplo con `index.js` o moviendo API a `/api` dedicado).
+2. **Frontend**: crear otro proyecto solo estatico (`index.html` + `app.js`).
+3. En frontend, definir `window.TASKFLOW_API_BASE_URL` apuntando al dominio del backend (ejemplo: `https://mi-api.vercel.app/api`).
 
-Mutaciones de estado por endpoint:
-
-```js
-await apiRequest("/tasks", {
-  method: "POST",
-  body: JSON.stringify({ text, category, priority }),
-});
-
-await apiRequest(`/tasks/${task.id}`, {
-  method: "PATCH",
-  body: JSON.stringify({ completed: !task.completed }),
-});
-
-await apiRequest(`/tasks/${task.id}`, { method: "DELETE" });
-```
-
-## Fragmentos clave: seguimiento y visualizacion de errores
-
-Error de backend normalizado en `apiRequest` (incluye `details[]`):
-
-```js
-if (!response.ok) {
-  const details = Array.isArray(payload.details) ? `\n- ${payload.details.join("\n- ")}` : "";
-  throw new Error(`${payload.error || "Error de API"}${details}`);
-}
-```
-
-Render de error en UI cuando falla carga de lista:
-
-```js
-try {
-  const tasks = await fetchTasks();
-  for (const task of tasks) taskListContainer.appendChild(createTaskElement(task));
-} catch (error) {
-  taskListContainer.innerHTML =
-    `<div class="rounded-xl border border-red-300 bg-red-50 text-red-700 p-3">${error.message}</div>`;
-}
-```
-
-Errores de mutacion informados al usuario en acciones (`POST/PATCH/DELETE`):
-
-```js
-try {
-  await apiRequest(`/tasks/${task.id}`, { method: "DELETE" });
-  await renderTasks();
-} catch (error) {
-  alert(error.message);
-}
-```
-
-## Debug rapido
-
-- Si el frontend muestra error de API:
-  - verifica que `server` este levantado.
-  - verifica CORS y URL de API.
-  - prueba `GET /api/health`.
-- Si hay error de validacion:
-  - revisar mensajes en respuesta JSON (`details`).
+Si no haces esta separacion, no necesitas configurar `TASKFLOW_API_BASE_URL`, porque el frontend usa `window.location.origin + "/api"` automaticamente.
